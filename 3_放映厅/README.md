@@ -1,0 +1,1 @@
+![截图](/3_放映厅/screenshot.jpg)

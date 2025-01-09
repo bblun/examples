@@ -1,0 +1,839 @@
+{
+  "main": {
+    "type": "block",
+    "data": {
+      "workspaceComments": [
+        {
+          "height": 415,
+          "width": 697,
+          "id": "=@YVD`%}Ny)oFdiZQ9DD",
+          "x": 90,
+          "y": -310,
+          "text": "这个示例重点介绍“地面投射环境”，就是把一个立方体反射纹理投射到地面，这样就把反射环境和地面融合到一起了。我们常见到一些线上汽车展示都带有这种效果。但是在实现方法上，他们可能采取的是把环境球下半部分压扁，这样做比较麻烦，也不好调整。\n\n1. 场景设置\n\na.软件默认采用左手坐标系。这个场景加载了一个.glb格式的模型，它是右手坐标系，所以场景要设置为右手坐标系；如果是.babylon格式的，保持默认就可以了\nb.环境纹理在PBR工作流程中为场景提供照明和反射环境，可以通过场景属性拼图设置，也可以在创建环境拼图的选项中设置\nc.地面投射环境会创建一个天空盒，把天空盒的底部当作地面，然后把环境纹理投射到地面，在地面和环境之间有一个过渡。调整投射半径和投射高度会改变地面纹理的比例和边缘的过渡\n\n注意，环境纹理和地面投射环境的反射纹理是两个纹理（同一张贴图），因为地面的反射纹理要做特殊投射，而环境纹理是天空盒投射。在这里是克隆了一个新的纹理。\n\n2.相机设置\n\na环绕相机可以通过alpha beta 半径等参数准确控制相机的行为，如限制观察角度，不让相机穿到地面以下\nb.自动回弹可以避免相机观察角度过近造成穿模\nc.锁定目标属性会禁用平移\nd.目标屏幕偏移属性可以在屏幕坐标下控制目标点的位置\n\n3.辉光特效\n\n辉光效果可以使材质高亮部分发出辉光。你可以进一步在渲染分类下的“辉光属性”拼图中设置强度等参数。\n\n4.灯光和阴影\n\na.灯光和阴影往往都需要细致的调节，你可以先创建灯光和阴影，然后在场景查看器中实时调节参数，再通过属性拼图设置最终的参数\nb.默认网格不产生和接收阴影，需要手动指定，分别在网格属性和添加投影网格拼图中指定；环境拼图中的地面是接收阴影的\n\n5.加载界面\n\na.替换logo - 把自己的logo图片利用下拉菜单 - 工具 - Base64编码器把图片转成编码，复制进logo图片选项中即可\nb.加载界面的其它选项都可以通过css设置"
+        }
+      ],
+      "blocks": {
+        "languageVersion": 0,
+        "blocks": [
+          {
+            "type": "advanced_comment",
+            "id": "tP-/`Yed6{z2Y5-tu:mg",
+            "x": 70,
+            "y": 130,
+            "extraState": {
+              "color": "#a5805b"
+            },
+            "fields": {
+              "COLOR": "#a5805b",
+              "INPUT": "使用了glb格式，所以场景改为右手坐标系，在“查找拼图”中输入“坐标系示意图”查看图解"
+            },
+            "next": {
+              "block": {
+                "type": "scene_properties_accessors",
+                "id": "XbEc!-=P!!.]c{g^x348",
+                "extraState": {
+                  "isStatement": true,
+                  "isValueInput": true
+                },
+                "fields": {
+                  "METHOD": "set",
+                  "KEY": "useRightHandedSystem"
+                },
+                "inputs": {
+                  "VALUE": {
+                    "shadow": {
+                      "type": "logic_boolean",
+                      "id": "L~f14vQ=4_`,mGNtgLo#",
+                      "fields": {
+                        "BOOL": "TRUE"
+                      }
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "scene_properties_accessors",
+                    "id": "V@LLc3umk^!#[BPh3[_1",
+                    "extraState": {
+                      "isStatement": true,
+                      "isValueInput": true
+                    },
+                    "fields": {
+                      "METHOD": "set",
+                      "KEY": "environmentTexture"
+                    },
+                    "inputs": {
+                      "VALUE": {
+                        "shadow": {
+                          "type": "field_texture",
+                          "id": "v-.753y{aZf8%fhEfKqG",
+                          "fields": {
+                            "NAME": "../public/texture/environment.dds"
+                          }
+                        },
+                        "block": {
+                          "type": "create_texture",
+                          "id": "6j=8S[.33p7ZzB7@cvix",
+                          "fields": {
+                            "TYPE": "CubeTexture",
+                            "invertY": false
+                          },
+                          "inputs": {
+                            "URL": {
+                              "shadow": {
+                                "type": "text",
+                                "id": "dLjXN30UCS9je`zuaQ_p",
+                                "fields": {
+                                  "TEXT": "../public/texture/environment.dds"
+                                }
+                              }
+                            },
+                            "OPTIONS": {
+                              "shadow": {
+                                "type": "empty_object",
+                                "id": "(cb]!Wm*aeD;43:nONc:"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "scene_create_projected_ground_environment",
+                        "id": "TRD}3QgWRDL6aR02+SuF",
+                        "inputs": {
+                          "SIZE": {
+                            "shadow": {
+                              "type": "math_number",
+                              "id": "h[%/P7T?B6MMgcZzc?`q",
+                              "fields": {
+                                "NUM": 500
+                              }
+                            }
+                          },
+                          "RADIUS": {
+                            "shadow": {
+                              "type": "math_number",
+                              "id": "R;9MME#V6Fm)UOK;dbDv",
+                              "fields": {
+                                "NUM": 20
+                              }
+                            }
+                          },
+                          "HEIGHT": {
+                            "shadow": {
+                              "type": "math_number",
+                              "id": "gVF_!RL=0tk%p%-TGZ`5",
+                              "fields": {
+                                "NUM": 5
+                              }
+                            }
+                          },
+                          "TEXTURE": {
+                            "shadow": {
+                              "type": "field_texture",
+                              "id": "RvuE4WQ#ay6`jBgPu1VM",
+                              "fields": {
+                                "NAME": ""
+                              }
+                            },
+                            "block": {
+                              "type": "clone_texture",
+                              "id": "]3*YuG:uuReDZ~I/FPS@",
+                              "inputs": {
+                                "TEXTURE": {
+                                  "shadow": {
+                                    "type": "field_texture",
+                                    "id": "=jkNtt30CmtgLrq4GJDd",
+                                    "fields": {
+                                      "NAME": "../public/texture/environment.dds"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "next": {
+                          "block": {
+                            "type": "advanced_comment",
+                            "id": "Al@%~XDPgc.XYjo?73-b",
+                            "extraState": {
+                              "color": "#a5805b"
+                            },
+                            "fields": {
+                              "COLOR": "#a5805b",
+                              "INPUT": "相机设置，在右上角查找拼图输入“环绕相机示意图”查看相机参数图解"
+                            },
+                            "next": {
+                              "block": {
+                                "type": "create_camera",
+                                "id": "ocjSX65GxXGh;S@151r.",
+                                "inline": false,
+                                "fields": {
+                                  "TYPE": "ArcRotateCamera"
+                                },
+                                "inputs": {
+                                  "NAME": {
+                                    "shadow": {
+                                      "type": "text",
+                                      "id": "ATmoHiY{FQ$s6s]v`{vI",
+                                      "fields": {
+                                        "TEXT": "camera"
+                                      }
+                                    }
+                                  },
+                                  "OPTIONS": {
+                                    "shadow": {
+                                      "type": "empty_object",
+                                      "id": "eY54.@8ppJY5{-4x2xHY"
+                                    },
+                                    "block": {
+                                      "type": "object_create",
+                                      "id": "%pgBexJrGi}qLSS[kJsl",
+                                      "fields": {
+                                        "EMPTY": false
+                                      },
+                                      "inputs": {
+                                        "ITEM": {
+                                          "block": {
+                                            "type": "create_arc_rotate_camera_options",
+                                            "id": "6@[dcAuiVyVzKQMwK?3!",
+                                            "fields": {
+                                              "KEY": "alpha"
+                                            },
+                                            "inputs": {
+                                              "VALUE": {
+                                                "shadow": {
+                                                  "type": "math_number",
+                                                  "id": "~w.TWB[;B/.BY6Cj(J.b",
+                                                  "fields": {
+                                                    "NUM": 0
+                                                  }
+                                                },
+                                                "block": {
+                                                  "type": "math_convert_to_radians",
+                                                  "id": "Vqxb2a1ZFE{gw$FhNHQZ",
+                                                  "inputs": {
+                                                    "VALUE": {
+                                                      "shadow": {
+                                                        "type": "math_angle",
+                                                        "id": "w.VtCyh;yns#T`7|pF5Q",
+                                                        "fields": {
+                                                          "ANGLE": 120
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            },
+                                            "next": {
+                                              "block": {
+                                                "type": "create_arc_rotate_camera_options",
+                                                "id": "QWZ.w|INK#KBn#_oUUMz",
+                                                "fields": {
+                                                  "KEY": "beta"
+                                                },
+                                                "inputs": {
+                                                  "VALUE": {
+                                                    "shadow": {
+                                                      "type": "math_number",
+                                                      "id": "OP-09PJ$S9P=rHI*#Drs",
+                                                      "fields": {
+                                                        "NUM": 0
+                                                      }
+                                                    },
+                                                    "block": {
+                                                      "type": "math_convert_to_radians",
+                                                      "id": "(E{ots)s%da0N)2[aH!N",
+                                                      "inputs": {
+                                                        "VALUE": {
+                                                          "shadow": {
+                                                            "type": "math_angle",
+                                                            "id": "Q}V)UdE:L|QA/lhX!UY=",
+                                                            "fields": {
+                                                              "ANGLE": 80
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                },
+                                                "next": {
+                                                  "block": {
+                                                    "type": "create_arc_rotate_camera_options",
+                                                    "id": "pE9t(P@X~i!(+8^);]3e",
+                                                    "fields": {
+                                                      "KEY": "upperBetaLimit"
+                                                    },
+                                                    "inputs": {
+                                                      "VALUE": {
+                                                        "shadow": {
+                                                          "type": "math_number",
+                                                          "id": "bCjvWN2sP%ii=NQzZs!m",
+                                                          "fields": {
+                                                            "NUM": 3.1316
+                                                          }
+                                                        },
+                                                        "block": {
+                                                          "type": "math_convert_to_radians",
+                                                          "id": "W:5CWj*zwDeCy=s=7]#q",
+                                                          "inputs": {
+                                                            "VALUE": {
+                                                              "shadow": {
+                                                                "type": "math_angle",
+                                                                "id": "%4fl@oiep,iJ^2}7O3GP",
+                                                                "fields": {
+                                                                  "ANGLE": 90
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    },
+                                                    "next": {
+                                                      "block": {
+                                                        "type": "create_arc_rotate_camera_options",
+                                                        "id": "z6Ib_xouC#sw`j3HGxv4",
+                                                        "fields": {
+                                                          "KEY": "radius"
+                                                        },
+                                                        "inputs": {
+                                                          "VALUE": {
+                                                            "shadow": {
+                                                              "type": "math_number",
+                                                              "id": "GH:lrfBJFSXm_KF;Z?T$",
+                                                              "fields": {
+                                                                "NUM": 8
+                                                              }
+                                                            }
+                                                          }
+                                                        },
+                                                        "next": {
+                                                          "block": {
+                                                            "type": "create_arc_rotate_camera_options",
+                                                            "id": "Li0)Pja61qFs0ej7?fp+",
+                                                            "fields": {
+                                                              "KEY": "targetScreenOffset"
+                                                            },
+                                                            "inputs": {
+                                                              "VALUE": {
+                                                                "shadow": {
+                                                                  "type": "field_vector2",
+                                                                  "id": "t`Y2=MLBbD:+g5/6`^Ju",
+                                                                  "fields": {
+                                                                    "X": 0,
+                                                                    "Y": -0.5
+                                                                  }
+                                                                }
+                                                              }
+                                                            },
+                                                            "next": {
+                                                              "block": {
+                                                                "type": "create_arc_rotate_camera_options",
+                                                                "id": "U{wM!D:jsCBl_td9/{a@",
+                                                                "fields": {
+                                                                  "KEY": "lockedTarget"
+                                                                },
+                                                                "inputs": {
+                                                                  "VALUE": {
+                                                                    "shadow": {
+                                                                      "type": "field_vector3",
+                                                                      "id": "~%{LKUejy^#hk#WA,;Tm",
+                                                                      "fields": {
+                                                                        "X": 0,
+                                                                        "Y": 0.3,
+                                                                        "Z": 0
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                },
+                                "next": {
+                                  "block": {
+                                    "type": "set_get_active_camera",
+                                    "id": "yj`xeG-b.tcl5`[CTxyL",
+                                    "extraState": {
+                                      "isStatement": true,
+                                      "isValueInput": true
+                                    },
+                                    "fields": {
+                                      "METHOD": "set"
+                                    },
+                                    "inputs": {
+                                      "VALUE": {
+                                        "shadow": {
+                                          "type": "camera_selector",
+                                          "id": "3G2.5}1h;.=N{Z+5i^5U",
+                                          "fields": {
+                                            "NAME": "camera"
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "next": {
+                                      "block": {
+                                        "type": "bounce_camera",
+                                        "id": "+UVo/Z2jO14Q|@cO1Nh0",
+                                        "inputs": {
+                                          "DURATION": {
+                                            "shadow": {
+                                              "type": "math_number",
+                                              "id": "([0q.jh-}3-hkS7I$qf=",
+                                              "fields": {
+                                                "NUM": 0.2
+                                              }
+                                            }
+                                          },
+                                          "MIN_RADIUS": {
+                                            "shadow": {
+                                              "type": "math_number",
+                                              "id": ",sNhFgo1IWh=)y[O28gq",
+                                              "fields": {
+                                                "NUM": 3
+                                              }
+                                            }
+                                          },
+                                          "MAX_RADIUS": {
+                                            "shadow": {
+                                              "type": "math_number",
+                                              "id": "9;C+g/RE@mPM@mRRedOd",
+                                              "fields": {
+                                                "NUM": 8
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "next": {
+                                          "block": {
+                                            "type": "advanced_comment",
+                                            "id": "Apk5Ur/0E??[xMu}oCAb",
+                                            "extraState": {
+                                              "color": "#a5805b"
+                                            },
+                                            "fields": {
+                                              "COLOR": "#a5805b",
+                                              "INPUT": "辉光特效"
+                                            },
+                                            "next": {
+                                              "block": {
+                                                "type": "advanced_connect",
+                                                "id": "Z,Eo7U!d=z0JB+R@qvF5",
+                                                "inputs": {
+                                                  "INPUT": {
+                                                    "block": {
+                                                      "type": "create_glow_layer",
+                                                      "id": "Z)UYu_wT[7.b2v^xiVqW",
+                                                      "inputs": {
+                                                        "NAME": {
+                                                          "shadow": {
+                                                            "type": "text",
+                                                            "id": "y!7b=#71zUCHjfgyv[pi",
+                                                            "fields": {
+                                                              "TEXT": "glow"
+                                                            }
+                                                          }
+                                                        },
+                                                        "OPTIONS": {
+                                                          "shadow": {
+                                                            "type": "empty_object",
+                                                            "id": "-pOx7^b{6OVBJa}Uulm8"
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                },
+                                                "next": {
+                                                  "block": {
+                                                    "type": "advanced_comment",
+                                                    "id": "2_u{G4;y+2/*~x(,=3sD",
+                                                    "extraState": {
+                                                      "color": "#a5805b"
+                                                    },
+                                                    "fields": {
+                                                      "COLOR": "#a5805b",
+                                                      "INPUT": "灯光和阴影"
+                                                    },
+                                                    "next": {
+                                                      "block": {
+                                                        "type": "create_light",
+                                                        "id": "AXl0i{`z|?}Wag6%p?vM",
+                                                        "inline": false,
+                                                        "fields": {
+                                                          "TYPE": "DirectionalLight"
+                                                        },
+                                                        "inputs": {
+                                                          "NAME": {
+                                                            "shadow": {
+                                                              "type": "text",
+                                                              "id": "Blyx1D?GRTec`EJxx86v",
+                                                              "fields": {
+                                                                "TEXT": "keyLight"
+                                                              }
+                                                            }
+                                                          },
+                                                          "OPTIONS": {
+                                                            "shadow": {
+                                                              "type": "empty_object",
+                                                              "id": "XmY)Ge~YW=}2JT-piIPE"
+                                                            },
+                                                            "block": {
+                                                              "type": "object_create",
+                                                              "id": "^[37xF2IMK`DJsV8Hjc]",
+                                                              "fields": {
+                                                                "EMPTY": false
+                                                              },
+                                                              "inputs": {
+                                                                "ITEM": {
+                                                                  "block": {
+                                                                    "type": "create_directional_light_options",
+                                                                    "id": "v:k`%OTp%Z?AAkdEt-Xa",
+                                                                    "fields": {
+                                                                      "KEY": "position"
+                                                                    },
+                                                                    "inputs": {
+                                                                      "VALUE": {
+                                                                        "shadow": {
+                                                                          "type": "field_vector3",
+                                                                          "id": "]|p?{{RFc9tQoHav%VjW",
+                                                                          "fields": {
+                                                                            "X": 0.322,
+                                                                            "Y": 3.776,
+                                                                            "Z": 1.636
+                                                                          }
+                                                                        }
+                                                                      }
+                                                                    },
+                                                                    "next": {
+                                                                      "block": {
+                                                                        "type": "create_directional_light_options",
+                                                                        "id": "A-te3i%VXRsRoWoCc~2Q",
+                                                                        "fields": {
+                                                                          "KEY": "direction"
+                                                                        },
+                                                                        "inputs": {
+                                                                          "VALUE": {
+                                                                            "shadow": {
+                                                                              "type": "field_vector3",
+                                                                              "id": "R3d,9iGjnop%Z8,+8L;h",
+                                                                              "fields": {
+                                                                                "X": -0.415,
+                                                                                "Y": -0.804,
+                                                                                "Z": -0.425
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        },
+                                                        "next": {
+                                                          "block": {
+                                                            "type": "create_shadow_for_light",
+                                                            "id": "gdGeNt}UpaFDyE5QI}U4",
+                                                            "inline": false,
+                                                            "fields": {
+                                                              "TYPE": "ShadowGenerator"
+                                                            },
+                                                            "inputs": {
+                                                              "LIGHT": {
+                                                                "shadow": {
+                                                                  "type": "light_selector",
+                                                                  "id": "nL(B*(`48SrWq$z+6U2y",
+                                                                  "fields": {
+                                                                    "NAME": "keyLight"
+                                                                  }
+                                                                }
+                                                              },
+                                                              "OPTIONS": {
+                                                                "shadow": {
+                                                                  "type": "empty_object",
+                                                                  "id": "0!1]w!U6?60}InXXg[fd"
+                                                                },
+                                                                "block": {
+                                                                  "type": "object_create",
+                                                                  "id": "xD*T8M2tyLSFYOpm*S4o",
+                                                                  "fields": {
+                                                                    "EMPTY": false
+                                                                  },
+                                                                  "inputs": {
+                                                                    "ITEM": {
+                                                                      "block": {
+                                                                        "type": "create_shadow_options",
+                                                                        "id": "#,,@|#y1J5gijL62*Ry0",
+                                                                        "fields": {
+                                                                          "KEY": "bias"
+                                                                        },
+                                                                        "inputs": {
+                                                                          "VALUE": {
+                                                                            "shadow": {
+                                                                              "type": "math_number",
+                                                                              "id": "k2;wnT~!UH_Xk{DX4-zN",
+                                                                              "fields": {
+                                                                                "NUM": 0
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                        },
+                                                                        "next": {
+                                                                          "block": {
+                                                                            "type": "create_shadow_options",
+                                                                            "id": "q.`D,@sk~mjAo{[+WV}j",
+                                                                            "fields": {
+                                                                              "KEY": "darkness"
+                                                                            },
+                                                                            "inputs": {
+                                                                              "VALUE": {
+                                                                                "shadow": {
+                                                                                  "type": "math_number",
+                                                                                  "id": "nLryNH^RD6v|-O4k3(8%",
+                                                                                  "fields": {
+                                                                                    "NUM": 0.3
+                                                                                  }
+                                                                                }
+                                                                              }
+                                                                            },
+                                                                            "next": {
+                                                                              "block": {
+                                                                                "type": "create_shadow_options",
+                                                                                "id": "._,hPUf1Ph:8*Ve9_}G.",
+                                                                                "fields": {
+                                                                                  "KEY": "filter"
+                                                                                },
+                                                                                "inputs": {
+                                                                                  "VALUE": {
+                                                                                    "shadow": {
+                                                                                      "type": "shadow_filter_dropdown",
+                                                                                      "id": "[R@/-b6dVfbSe[-*$mY*",
+                                                                                      "fields": {
+                                                                                        "MOD": "6"
+                                                                                      }
+                                                                                    }
+                                                                                  }
+                                                                                }
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            },
+                                                            "next": {
+                                                              "block": {
+                                                                "type": "advanced_comment",
+                                                                "id": "VKOi0!k+bU@1~o``HjI8",
+                                                                "extraState": {
+                                                                  "color": "#a5805b"
+                                                                },
+                                                                "fields": {
+                                                                  "COLOR": "#a5805b",
+                                                                  "INPUT": "加载资产"
+                                                                },
+                                                                "next": {
+                                                                  "block": {
+                                                                    "type": "scene_add_loading_task",
+                                                                    "id": "8bf,H{Or_Ah3Sc-03~o=",
+                                                                    "fields": {
+                                                                      "TYPE": "addMeshTask",
+                                                                      "INVERT_Y": false
+                                                                    },
+                                                                    "inputs": {
+                                                                      "NAME": {
+                                                                        "shadow": {
+                                                                          "type": "text",
+                                                                          "id": "Wg);s1d:jc}Tz0wU?Omb",
+                                                                          "fields": {
+                                                                            "TEXT": "loadMesh"
+                                                                          }
+                                                                        }
+                                                                      },
+                                                                      "URL": {
+                                                                        "shadow": {
+                                                                          "type": "text",
+                                                                          "id": "dH42r};Xt/C*qSo]a[?8",
+                                                                          "fields": {
+                                                                            "TEXT": "assets/scene/cartoon_car.glb"
+                                                                          }
+                                                                        }
+                                                                      }
+                                                                    },
+                                                                    "next": {
+                                                                      "block": {
+                                                                        "type": "scene_listen_loading_event",
+                                                                        "id": "h2pF@d`m!{lqw0!99BYi",
+                                                                        "extraState": {
+                                                                          "enabledprogresscb": false
+                                                                        },
+                                                                        "inputs": {
+                                                                          "LOADING_SCREEN": {
+                                                                            "block": {
+                                                                              "type": "scene_create_loading_screen",
+                                                                              "id": "$+TPk7RVs%)Zd3:ZJ4S*",
+                                                                              "inputs": {
+                                                                                "OPTIONS": {
+                                                                                  "shadow": {
+                                                                                    "type": "empty_object",
+                                                                                    "id": "cTM{7].R_L{lM!1q2Fby"
+                                                                                  },
+                                                                                  "block": {
+                                                                                    "type": "object_create",
+                                                                                    "id": "PD~@?~iSNFeMJZ:,@)k]",
+                                                                                    "fields": {
+                                                                                      "EMPTY": false
+                                                                                    },
+                                                                                    "inputs": {
+                                                                                      "ITEM": {
+                                                                                        "block": {
+                                                                                          "type": "scene_create_loading_screen_option",
+                                                                                          "id": "lo3,4)6]GR#gZoqTSn2`",
+                                                                                          "fields": {
+                                                                                            "KEY": "logoImage"
+                                                                                          },
+                                                                                          "inputs": {
+                                                                                            "VALUE": {
+                                                                                              "shadow": {
+                                                                                                "type": "text",
+                                                                                                "id": "DV;L`=ZM(Yp{T{s|[/B4",
+                                                                                                "fields": {
+                                                                                                  "TEXT": "data:image/png;base64,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"
+                                                                                                }
+                                                                                              }
+                                                                                            }
+                                                                                          },
+                                                                                          "next": {
+                                                                                            "block": {
+                                                                                              "type": "scene_create_loading_screen_option",
+                                                                                              "id": "_d+wK(E#SIhL]/+]?f2e",
+                                                                                              "fields": {
+                                                                                                "KEY": "barBackground"
+                                                                                              },
+                                                                                              "inputs": {
+                                                                                                "VALUE": {
+                                                                                                  "shadow": {
+                                                                                                    "type": "text",
+                                                                                                    "id": "@,@4DJH4xQ||jv/a`Qi$",
+                                                                                                    "fields": {
+                                                                                                      "TEXT": "linear-gradient(90deg, #65c6bb, #1da49b"
+                                                                                                    }
+                                                                                                  }
+                                                                                                }
+                                                                                              }
+                                                                                            }
+                                                                                          }
+                                                                                        }
+                                                                                      }
+                                                                                    }
+                                                                                  }
+                                                                                }
+                                                                              }
+                                                                            }
+                                                                          },
+                                                                          "ON_FINISH": {
+                                                                            "block": {
+                                                                              "type": "add_shadow_caster",
+                                                                              "id": "*:hc9Qg$X{CB|Qk+K4m9",
+                                                                              "fields": {
+                                                                                "METHOD": "addShadowCaster"
+                                                                              },
+                                                                              "inputs": {
+                                                                                "MESH": {
+                                                                                  "shadow": {
+                                                                                    "type": "mesh_selector",
+                                                                                    "id": "FE|GJLWq#V@^Kq^J%s92",
+                                                                                    "fields": {
+                                                                                      "NAME": "car"
+                                                                                    }
+                                                                                  }
+                                                                                },
+                                                                                "SHADOW": {
+                                                                                  "block": {
+                                                                                    "type": "get_shadow_from_light",
+                                                                                    "id": "CuBQ%@a.Lw0X+uZ1n)U+",
+                                                                                    "inputs": {
+                                                                                      "LIGHT": {
+                                                                                        "shadow": {
+                                                                                          "type": "light_selector",
+                                                                                          "id": "(@rVd`~OR7{Ct:E[w)a!",
+                                                                                          "fields": {
+                                                                                            "NAME": "keyLight"
+                                                                                          }
+                                                                                        }
+                                                                                      }
+                                                                                    }
+                                                                                  }
+                                                                                }
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "setting": {
+    "data": {
+      "gutterPosition": "80",
+      "openInspector": false,
+      "glob": []
+    }
+  }
+}

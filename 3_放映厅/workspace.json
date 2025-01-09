@@ -1,0 +1,1451 @@
+{
+  "main": {
+    "type": "block",
+    "data": {
+      "workspaceComments": [
+        {
+          "height": 329.1171875,
+          "width": 611.3359375,
+          "id": "K5i1%By8`XA~$aJEs0+m",
+          "x": 110,
+          "y": -230,
+          "text": "这个示例通过视频纹理实现了一个虚拟放映厅。这里我们稍微加入一点逻辑，通过点击荧幕控制视频播放。\n\n制作思路是在视频纹理的前方增加了一个叠加层，用来显示暂停界面，这个界面可以用贴图，也可以像本例一样用下拉菜单 - 工具 - 界面编辑器，制作一个网格纹理。\n\n1.加载json\n\n界面编辑器制作的界面，可以作为全屏UI，也可以作为一个网格的纹理。这里我们把编辑好的界面保存为json文件，然后通过加载文本加载进来。\n\n要编辑界面可以从界面编辑器加载json文件，然后修改；也可以通过点击场景检查器 - GUI下面纹理右侧的铅笔图标编辑。\n\n2.漫游相机\n\n默认的相机是环绕相机，我们要模拟的第一人称视角需要用到漫游相机。创建完成后要使用“激活相机”拼图将它激活，取代默认相机。\n\n3.创建荧幕\n\n首先创建一个面片，将它的尺寸设置成与视频同样的比例，这里需要注意，因为我们使用右手坐标系，创建的面片默认是背面面向相机，所以要将面片的面朝向设置为“背面”。\n\n然后为面片创建材质和视频纹理。材质分类下的“视频纹理”拼图可以从本地加载一个视频，一般是mp4格式，兼容性好；另外，它还可以设置一些选项，如循环、静音等。选项通过视频纹理拼图右键菜单 - 创建 选项 得到。然后将视频纹理作为自发光贴图赋给一个标准材质，这个材质不需要照明，所以材质禁用灯光。\n\n最后一步，将材质赋予面片，同时设置正确的位置。\n\n4.创建荧幕叠加层\n\n为了实现播放暂停效果，我们在荧幕前面设置一个叠加层，这个叠加层是用界面编辑器制作的，界面也可以作为纹理使用。与上一步类似，只是这里我们用界面分类下的“创建网格纹理”拼图创建贴图。\n\n“创建网格纹理”拼图有这样几个参数：\n网格：用于指定目标网格\n宽高：与界面编辑器中设置的画布尺寸一致，这是纹理的大小\n捕获指针：如果勾选，纹理中的控件就可以点击，不勾选就像普通贴图一样，这里我们点击的是模型，因此取消勾选\nJSON：就是在资产管理中加载的json，这里是通过选项卡参数传递的\n\n5.事件和逻辑\n\n我们使用事件分类下的“监听指针事件”拼图控制鼠标点击时视频纹理的播放、暂停。从事件拼图右键菜单中可以创建“点击信息”拼图，从中可以得到鼠标点击模式时的位置、法线等有用的信息，在后面的教程中它会有更大的用处，这里我们只是简单的用它判断点击的网格是不是屏幕叠加层。\n\n在判断的过程中，我们用到了逻辑分类下的“逻辑若则”“逻辑比较”“逻辑非”等拼图，用来实现每次点击时，切换“isPlaying”变量的真假值，从而控制视频的播放和暂停，同时控制荧幕叠加层的显示、隐藏。\n\n"
+        }
+      ],
+      "blocks": {
+        "languageVersion": 0,
+        "blocks": [
+          {
+            "type": "advanced_comment",
+            "id": "!T)a8xB#0^UXwLjwH2A$",
+            "x": 101,
+            "y": 126,
+            "extraState": {
+              "color": "#a5805b"
+            },
+            "fields": {
+              "COLOR": "#a5805b",
+              "INPUT": "使用了glb格式，所以场景改为右手坐标系，在“查找拼图”中输入“坐标系示意图”查看图解"
+            },
+            "next": {
+              "block": {
+                "type": "scene_properties_accessors",
+                "id": "~#.v1z0BBj#Nqpt4]@~*",
+                "extraState": {
+                  "isStatement": true,
+                  "isValueInput": true
+                },
+                "fields": {
+                  "METHOD": "set",
+                  "KEY": "useRightHandedSystem"
+                },
+                "inputs": {
+                  "VALUE": {
+                    "shadow": {
+                      "type": "logic_boolean",
+                      "id": "z3u1@k`0uI)_o^lw0+(Q",
+                      "fields": {
+                        "BOOL": "TRUE"
+                      }
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "advanced_comment",
+                    "id": "=T.clu2#PW8whFFGA4:=",
+                    "extraState": {
+                      "color": "#a5805b"
+                    },
+                    "fields": {
+                      "COLOR": "#a5805b",
+                      "INPUT": "相机"
+                    },
+                    "next": {
+                      "block": {
+                        "type": "create_camera",
+                        "id": "{Ktz:MZ|]S,RY4^CHNbE",
+                        "inline": false,
+                        "fields": {
+                          "TYPE": "UniversalCamera"
+                        },
+                        "inputs": {
+                          "NAME": {
+                            "shadow": {
+                              "type": "text",
+                              "id": "tB9M]=J{y7^b@IVhc1:n",
+                              "fields": {
+                                "TEXT": "camera"
+                              }
+                            }
+                          },
+                          "OPTIONS": {
+                            "shadow": {
+                              "type": "empty_object",
+                              "id": "{HU,w@QM_U{iyPK+dGkm"
+                            },
+                            "block": {
+                              "type": "object_create",
+                              "id": "wShrhTy3Y]~3Jyi$?(Z2",
+                              "fields": {
+                                "EMPTY": false
+                              },
+                              "inputs": {
+                                "ITEM": {
+                                  "block": {
+                                    "type": "create_universal_camera_options",
+                                    "id": "2c]eC[dZR0vpF[olR3yL",
+                                    "fields": {
+                                      "KEY": "target"
+                                    },
+                                    "inputs": {
+                                      "VALUE": {
+                                        "shadow": {
+                                          "type": "field_vector3",
+                                          "id": "%EA*=^X#Xx*fv*k!!dVx",
+                                          "fields": {
+                                            "X": 0,
+                                            "Y": 0,
+                                            "Z": -10
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "next": {
+                          "block": {
+                            "type": "set_get_active_camera",
+                            "id": "iQ+QKR)xDP?9{0[)J_6p",
+                            "extraState": {
+                              "isStatement": true,
+                              "isValueInput": true
+                            },
+                            "fields": {
+                              "METHOD": "set"
+                            },
+                            "inputs": {
+                              "VALUE": {
+                                "shadow": {
+                                  "type": "camera_selector",
+                                  "id": "9GCln;oVU!]OQC`$KGH_",
+                                  "fields": {
+                                    "NAME": "camera"
+                                  }
+                                }
+                              }
+                            },
+                            "next": {
+                              "block": {
+                                "type": "dispose_camera",
+                                "id": "o6R46E04AiIT;ARkZw{e",
+                                "inputs": {
+                                  "CAMERA": {
+                                    "shadow": {
+                                      "type": "camera_selector",
+                                      "id": "xNA%zJpHqY|^hlXxk1D4",
+                                      "fields": {
+                                        "NAME": "defaultCamera"
+                                      }
+                                    }
+                                  }
+                                },
+                                "next": {
+                                  "block": {
+                                    "type": "scene_add_loading_task",
+                                    "id": "siuDBT.5M:?PIWs0}]B!",
+                                    "fields": {
+                                      "TYPE": "addMeshTask",
+                                      "INVERT_Y": false
+                                    },
+                                    "inputs": {
+                                      "NAME": {
+                                        "shadow": {
+                                          "type": "text",
+                                          "id": "vDv2uvfILfecFm7:aQXe",
+                                          "fields": {
+                                            "TEXT": "loadAsset"
+                                          }
+                                        }
+                                      },
+                                      "URL": {
+                                        "shadow": {
+                                          "type": "text",
+                                          "id": "ajHkqr{c16-R#k0Z4|Qv",
+                                          "fields": {
+                                            "TEXT": "assets/scene/cinema.glb"
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "next": {
+                                      "block": {
+                                        "type": "scene_add_loading_task",
+                                        "id": "oY6^P]qvQe;~w56QT9p.",
+                                        "fields": {
+                                          "TYPE": "addTextFileTask",
+                                          "INVERT_Y": false
+                                        },
+                                        "inputs": {
+                                          "NAME": {
+                                            "shadow": {
+                                              "type": "text",
+                                              "id": "%QLQHy8j*3OMA?!-ZeNX",
+                                              "fields": {
+                                                "TEXT": "loadUI"
+                                              }
+                                            }
+                                          },
+                                          "URL": {
+                                            "shadow": {
+                                              "type": "text",
+                                              "id": "~f{2=(qg}br~@DV(IMw^",
+                                              "fields": {
+                                                "TEXT": "assets/json/videoTextureUI.json"
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "next": {
+                                          "block": {
+                                            "type": "scene_listen_loading_event",
+                                            "id": "k.FL9iCX{Y{9}HiRH88u",
+                                            "extraState": {
+                                              "enabledprogresscb": false
+                                            },
+                                            "inputs": {
+                                              "ON_FINISH": {
+                                                "block": {
+                                                  "type": "advanced_comment",
+                                                  "id": "80H+_LR3@b0(f}1WDfn{",
+                                                  "extraState": {
+                                                    "color": "#a5805b"
+                                                  },
+                                                  "fields": {
+                                                    "COLOR": "#a5805b",
+                                                    "INPUT": "荧幕"
+                                                  },
+                                                  "next": {
+                                                    "block": {
+                                                      "type": "variables_set",
+                                                      "id": "f$TlLk}Dj1^H}=zB3HWE",
+                                                      "fields": {
+                                                        "VAR": {
+                                                          "id": "~e0s8I`F[hCORS2Ygmn^"
+                                                        }
+                                                      },
+                                                      "inputs": {
+                                                        "VALUE": {
+                                                          "block": {
+                                                            "type": "mesh_create_set_shapes",
+                                                            "id": "kFG4`Xv%8q#a0GzmdkWy",
+                                                            "inline": false,
+                                                            "fields": {
+                                                              "TYPE": "Plane"
+                                                            },
+                                                            "inputs": {
+                                                              "NAME": {
+                                                                "shadow": {
+                                                                  "type": "text",
+                                                                  "id": "w9te|[#YWyTJ6Qu}bTr8",
+                                                                  "fields": {
+                                                                    "TEXT": "screen"
+                                                                  }
+                                                                }
+                                                              },
+                                                              "OPTIONS": {
+                                                                "shadow": {
+                                                                  "type": "empty_object",
+                                                                  "id": "!;F1b`j8De.Ez7ldtk@g"
+                                                                },
+                                                                "block": {
+                                                                  "type": "object_create",
+                                                                  "id": "S3}{~%r2,^lB-LYn4}O{",
+                                                                  "fields": {
+                                                                    "EMPTY": false
+                                                                  },
+                                                                  "inputs": {
+                                                                    "ITEM": {
+                                                                      "block": {
+                                                                        "type": "mesh_create_plane_option",
+                                                                        "id": "_9?Q2|JY,VA4IWwY#Z[t",
+                                                                        "fields": {
+                                                                          "KEY": "width"
+                                                                        },
+                                                                        "inputs": {
+                                                                          "VALUE": {
+                                                                            "shadow": {
+                                                                              "type": "math_number",
+                                                                              "id": "T2+:y%YN9n,D{zu/1+83",
+                                                                              "fields": {
+                                                                                "NUM": 16
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                        },
+                                                                        "next": {
+                                                                          "block": {
+                                                                            "type": "mesh_create_plane_option",
+                                                                            "id": "k6aiXA]zaEwJ@raj)D;E",
+                                                                            "fields": {
+                                                                              "KEY": "height"
+                                                                            },
+                                                                            "inputs": {
+                                                                              "VALUE": {
+                                                                                "shadow": {
+                                                                                  "type": "math_number",
+                                                                                  "id": "]/%y9is9y=guQIy+v+q`",
+                                                                                  "fields": {
+                                                                                    "NUM": 9
+                                                                                  }
+                                                                                }
+                                                                              }
+                                                                            },
+                                                                            "next": {
+                                                                              "block": {
+                                                                                "type": "mesh_create_plane_option",
+                                                                                "id": "*-]1Io#3E_pYXSIWzdZh",
+                                                                                "fields": {
+                                                                                  "KEY": "sideOrientation"
+                                                                                },
+                                                                                "inputs": {
+                                                                                  "VALUE": {
+                                                                                    "shadow": {
+                                                                                      "type": "side_orientation_dropdown",
+                                                                                      "id": "e^$x@A:9q2:7$cX=lmX~",
+                                                                                      "fields": {
+                                                                                        "MOD": "1"
+                                                                                      }
+                                                                                    }
+                                                                                  }
+                                                                                }
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                      },
+                                                      "next": {
+                                                        "block": {
+                                                          "type": "create_video_texture",
+                                                          "id": "Ol6.lcYcjg1N2jDn:Se4",
+                                                          "inline": false,
+                                                          "inputs": {
+                                                            "NAME": {
+                                                              "shadow": {
+                                                                "type": "text",
+                                                                "id": "~6m|^qY@zhq,JzVSS$RN",
+                                                                "fields": {
+                                                                  "TEXT": "videoTexture"
+                                                                }
+                                                              }
+                                                            },
+                                                            "URL": {
+                                                              "shadow": {
+                                                                "type": "text",
+                                                                "id": "CfY@ZOp~G?^#:uWdlW,,",
+                                                                "fields": {
+                                                                  "TEXT": "assets/media/zccws.mp4"
+                                                                }
+                                                              }
+                                                            },
+                                                            "OPTIONS": {
+                                                              "shadow": {
+                                                                "type": "empty_object",
+                                                                "id": "BN6De$|=K6+8G[)I4#0t"
+                                                              },
+                                                              "block": {
+                                                                "type": "object_create",
+                                                                "id": "Av_@o_nj+(N@.;Q@CLp,",
+                                                                "fields": {
+                                                                  "EMPTY": false
+                                                                },
+                                                                "inputs": {
+                                                                  "ITEM": {
+                                                                    "block": {
+                                                                      "type": "create_video_texture_options",
+                                                                      "id": "|whXH!o~B6i45Q8:i!-W",
+                                                                      "fields": {
+                                                                        "KEY": "muted"
+                                                                      },
+                                                                      "inputs": {
+                                                                        "VALUE": {
+                                                                          "shadow": {
+                                                                            "type": "logic_boolean",
+                                                                            "id": "G):biug;)cyZP8uo/8Zk",
+                                                                            "fields": {
+                                                                              "BOOL": "FALSE"
+                                                                            }
+                                                                          }
+                                                                        }
+                                                                      },
+                                                                      "next": {
+                                                                        "block": {
+                                                                          "type": "create_video_texture_options",
+                                                                          "id": "*C6ZBj@jx_R{D1yb)L3J",
+                                                                          "fields": {
+                                                                            "KEY": "autoPlay"
+                                                                          },
+                                                                          "inputs": {
+                                                                            "VALUE": {
+                                                                              "shadow": {
+                                                                                "type": "logic_boolean",
+                                                                                "id": "wYJJOQ#n5^64-lN.ad$@",
+                                                                                "fields": {
+                                                                                  "BOOL": "FALSE"
+                                                                                }
+                                                                              }
+                                                                            }
+                                                                          },
+                                                                          "next": {
+                                                                            "block": {
+                                                                              "type": "create_video_texture_options",
+                                                                              "id": "Q#Ja4A1w?rq.up{|EP7M",
+                                                                              "fields": {
+                                                                                "KEY": "poster"
+                                                                              },
+                                                                              "inputs": {
+                                                                                "VALUE": {
+                                                                                  "shadow": {
+                                                                                    "type": "text",
+                                                                                    "id": "A}u0w+viN2TDK*s=9p`w",
+                                                                                    "fields": {
+                                                                                      "TEXT": "assets/media/poster.jpg"
+                                                                                    }
+                                                                                  }
+                                                                                }
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          },
+                                                          "next": {
+                                                            "block": {
+                                                              "type": "create_material",
+                                                              "id": "^E09K@`/u58ojCKEJ6]U",
+                                                              "inline": false,
+                                                              "fields": {
+                                                                "TYPE": "StandardMaterial"
+                                                              },
+                                                              "inputs": {
+                                                                "NAME": {
+                                                                  "shadow": {
+                                                                    "type": "text",
+                                                                    "id": "@LX5Ps#.1_4xpTlC-]]h",
+                                                                    "fields": {
+                                                                      "TEXT": "videoMaterial"
+                                                                    }
+                                                                  }
+                                                                },
+                                                                "OPTIONS": {
+                                                                  "shadow": {
+                                                                    "type": "empty_object",
+                                                                    "id": "oEk3GJ.J6;#wB|~hxmGw"
+                                                                  },
+                                                                  "block": {
+                                                                    "type": "object_create",
+                                                                    "id": "~@Av=)BnCc,KaoU3et;l",
+                                                                    "fields": {
+                                                                      "EMPTY": false
+                                                                    },
+                                                                    "inputs": {
+                                                                      "ITEM": {
+                                                                        "block": {
+                                                                          "type": "standard_material_options",
+                                                                          "id": "A8GpCOC/P8;g?WP9nk4j",
+                                                                          "extraState": {
+                                                                            "majorKey": "TEXTURES",
+                                                                            "subKey": "emissiveTexture"
+                                                                          },
+                                                                          "fields": {
+                                                                            "MAJOR_KEY": "TEXTURES",
+                                                                            "KEY": "emissiveTexture"
+                                                                          },
+                                                                          "inputs": {
+                                                                            "VALUE": {
+                                                                              "shadow": {
+                                                                                "type": "texture_selector",
+                                                                                "id": "(XMzIyoe}%2t9LB@-]8^",
+                                                                                "fields": {
+                                                                                  "NAME": "videoTexture"
+                                                                                }
+                                                                              }
+                                                                            }
+                                                                          },
+                                                                          "next": {
+                                                                            "block": {
+                                                                              "type": "standard_material_options",
+                                                                              "id": "+Pl0L8GT`!;|Z@^kSaV6",
+                                                                              "extraState": {
+                                                                                "majorKey": "GENERAL",
+                                                                                "subKey": "disableLighting"
+                                                                              },
+                                                                              "fields": {
+                                                                                "MAJOR_KEY": "GENERAL",
+                                                                                "KEY": "disableLighting"
+                                                                              },
+                                                                              "inputs": {
+                                                                                "VALUE": {
+                                                                                  "shadow": {
+                                                                                    "type": "logic_boolean",
+                                                                                    "id": "%nbVnmjG~ca|o@|5Z^_a",
+                                                                                    "fields": {
+                                                                                      "BOOL": "TRUE"
+                                                                                    }
+                                                                                  }
+                                                                                }
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              },
+                                                              "next": {
+                                                                "block": {
+                                                                  "type": "mesh_properties_accessors",
+                                                                  "id": "/ct!#hV{8;7k.M[(/G:V",
+                                                                  "extraState": {
+                                                                    "isStatement": true,
+                                                                    "isValueInput": true
+                                                                  },
+                                                                  "fields": {
+                                                                    "METHOD": "set",
+                                                                    "KEY": "position"
+                                                                  },
+                                                                  "inputs": {
+                                                                    "OBJECT": {
+                                                                      "shadow": {
+                                                                        "type": "mesh_selector",
+                                                                        "id": "WHZbZG)nKE*NA5I=DkT^",
+                                                                        "fields": {
+                                                                          "NAME": ""
+                                                                        }
+                                                                      },
+                                                                      "block": {
+                                                                        "type": "variables_get",
+                                                                        "id": "myJ#=4n;,uXlZOa*fQIS",
+                                                                        "fields": {
+                                                                          "VAR": {
+                                                                            "id": "~e0s8I`F[hCORS2Ygmn^"
+                                                                          }
+                                                                        }
+                                                                      }
+                                                                    },
+                                                                    "VALUE": {
+                                                                      "shadow": {
+                                                                        "type": "field_vector3",
+                                                                        "id": "RJw)9mhI?.msa(|(|O-E",
+                                                                        "fields": {
+                                                                          "X": 0,
+                                                                          "Y": 2,
+                                                                          "Z": -15
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  },
+                                                                  "next": {
+                                                                    "block": {
+                                                                      "type": "mesh_properties_accessors",
+                                                                      "id": "6X$Hi^Jn#{6iA-[I*H`$",
+                                                                      "extraState": {
+                                                                        "isStatement": true,
+                                                                        "isValueInput": true
+                                                                      },
+                                                                      "fields": {
+                                                                        "METHOD": "set",
+                                                                        "KEY": "isPickable"
+                                                                      },
+                                                                      "inputs": {
+                                                                        "OBJECT": {
+                                                                          "shadow": {
+                                                                            "type": "mesh_selector",
+                                                                            "id": "WHZbZG)nKE*NA5I=DkT^",
+                                                                            "fields": {
+                                                                              "NAME": ""
+                                                                            }
+                                                                          },
+                                                                          "block": {
+                                                                            "type": "variables_get",
+                                                                            "id": "H@ZKSBOR4$}@}cu?@pPy",
+                                                                            "fields": {
+                                                                              "VAR": {
+                                                                                "id": "~e0s8I`F[hCORS2Ygmn^"
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                        },
+                                                                        "VALUE": {
+                                                                          "shadow": {
+                                                                            "type": "logic_boolean",
+                                                                            "id": "Y.JA0D`SX-E-,lpz%B40",
+                                                                            "fields": {
+                                                                              "BOOL": "FALSE"
+                                                                            }
+                                                                          }
+                                                                        }
+                                                                      },
+                                                                      "next": {
+                                                                        "block": {
+                                                                          "type": "mesh_properties_accessors",
+                                                                          "id": "[*RH3LN46)*dkVs%N*#w",
+                                                                          "extraState": {
+                                                                            "isStatement": true,
+                                                                            "isValueInput": true
+                                                                          },
+                                                                          "fields": {
+                                                                            "METHOD": "set",
+                                                                            "KEY": "material"
+                                                                          },
+                                                                          "inputs": {
+                                                                            "OBJECT": {
+                                                                              "block": {
+                                                                                "type": "variables_get",
+                                                                                "id": ":^2*8y51r7Ji3b2}_*aO",
+                                                                                "fields": {
+                                                                                  "VAR": {
+                                                                                    "id": "~e0s8I`F[hCORS2Ygmn^"
+                                                                                  }
+                                                                                }
+                                                                              }
+                                                                            },
+                                                                            "VALUE": {
+                                                                              "shadow": {
+                                                                                "type": "material_selector",
+                                                                                "id": ":1]X3Y|mr^aPbl`NiYpl",
+                                                                                "fields": {
+                                                                                  "NAME": "videoMaterial"
+                                                                                }
+                                                                              }
+                                                                            }
+                                                                          },
+                                                                          "next": {
+                                                                            "block": {
+                                                                              "type": "advanced_comment",
+                                                                              "id": "};=A,GW#XfNLsHj=E=yJ",
+                                                                              "extraState": {
+                                                                                "color": "#a5805b"
+                                                                              },
+                                                                              "fields": {
+                                                                                "COLOR": "#a5805b",
+                                                                                "INPUT": "荧幕叠加层"
+                                                                              },
+                                                                              "next": {
+                                                                                "block": {
+                                                                                  "type": "variables_set",
+                                                                                  "id": "3|kj=08R^YUvlRo3B2L,",
+                                                                                  "fields": {
+                                                                                    "VAR": {
+                                                                                      "id": "yra4=LNH-j[*jFV%4Qsm"
+                                                                                    }
+                                                                                  },
+                                                                                  "inputs": {
+                                                                                    "VALUE": {
+                                                                                      "block": {
+                                                                                        "type": "mesh_create_set_shapes",
+                                                                                        "id": "AmD?rmS7JYQgm/^YR).t",
+                                                                                        "inline": false,
+                                                                                        "fields": {
+                                                                                          "TYPE": "Plane"
+                                                                                        },
+                                                                                        "inputs": {
+                                                                                          "NAME": {
+                                                                                            "shadow": {
+                                                                                              "type": "text",
+                                                                                              "id": "?H7,6tArqE#sURfE6JTc",
+                                                                                              "fields": {
+                                                                                                "TEXT": "overlay"
+                                                                                              }
+                                                                                            }
+                                                                                          },
+                                                                                          "OPTIONS": {
+                                                                                            "shadow": {
+                                                                                              "type": "empty_object",
+                                                                                              "id": "!;F1b`j8De.Ez7ldtk@g"
+                                                                                            },
+                                                                                            "block": {
+                                                                                              "type": "object_create",
+                                                                                              "id": "/Ho)`OiA|e0B{A(=S1[N",
+                                                                                              "fields": {
+                                                                                                "EMPTY": false
+                                                                                              },
+                                                                                              "inputs": {
+                                                                                                "ITEM": {
+                                                                                                  "block": {
+                                                                                                    "type": "mesh_create_plane_option",
+                                                                                                    "id": "4}#.I)?|5!e~NTew.fn{",
+                                                                                                    "fields": {
+                                                                                                      "KEY": "width"
+                                                                                                    },
+                                                                                                    "inputs": {
+                                                                                                      "VALUE": {
+                                                                                                        "shadow": {
+                                                                                                          "type": "math_number",
+                                                                                                          "id": "8ni}ahZp|]p27!O%**ij",
+                                                                                                          "fields": {
+                                                                                                            "NUM": 16
+                                                                                                          }
+                                                                                                        }
+                                                                                                      }
+                                                                                                    },
+                                                                                                    "next": {
+                                                                                                      "block": {
+                                                                                                        "type": "mesh_create_plane_option",
+                                                                                                        "id": "#zNhhVwho+(D8$+}vu_i",
+                                                                                                        "fields": {
+                                                                                                          "KEY": "height"
+                                                                                                        },
+                                                                                                        "inputs": {
+                                                                                                          "VALUE": {
+                                                                                                            "shadow": {
+                                                                                                              "type": "math_number",
+                                                                                                              "id": ",:vF{oVhuM5]95Csl|[k",
+                                                                                                              "fields": {
+                                                                                                                "NUM": 9
+                                                                                                              }
+                                                                                                            }
+                                                                                                          }
+                                                                                                        },
+                                                                                                        "next": {
+                                                                                                          "block": {
+                                                                                                            "type": "mesh_create_plane_option",
+                                                                                                            "id": "3,]6}zkfh*#.DPrK8_2i",
+                                                                                                            "fields": {
+                                                                                                              "KEY": "sideOrientation"
+                                                                                                            },
+                                                                                                            "inputs": {
+                                                                                                              "VALUE": {
+                                                                                                                "shadow": {
+                                                                                                                  "type": "side_orientation_dropdown",
+                                                                                                                  "id": "is$~q2Ox{)tHMQOgr=;v",
+                                                                                                                  "fields": {
+                                                                                                                    "MOD": "1"
+                                                                                                                  }
+                                                                                                                }
+                                                                                                              }
+                                                                                                            }
+                                                                                                          }
+                                                                                                        }
+                                                                                                      }
+                                                                                                    }
+                                                                                                  }
+                                                                                                }
+                                                                                              }
+                                                                                            }
+                                                                                          }
+                                                                                        }
+                                                                                      }
+                                                                                    }
+                                                                                  },
+                                                                                  "next": {
+                                                                                    "block": {
+                                                                                      "type": "variables_set",
+                                                                                      "id": "w$V)kyGmwvU8s/CM:gdo",
+                                                                                      "fields": {
+                                                                                        "VAR": {
+                                                                                          "id": "1SG:w+mkY2C_)TFQ5v`e"
+                                                                                        }
+                                                                                      },
+                                                                                      "inputs": {
+                                                                                        "VALUE": {
+                                                                                          "block": {
+                                                                                            "type": "create_adt_for_mesh_texture",
+                                                                                            "id": "FdcUEOBGBeaDw]o.W*1o",
+                                                                                            "fields": {
+                                                                                              "POINTER_MOVE": false
+                                                                                            },
+                                                                                            "inputs": {
+                                                                                              "MESH": {
+                                                                                                "shadow": {
+                                                                                                  "type": "mesh_selector",
+                                                                                                  "id": "gOCmcbmgJjdruC$~PYLN",
+                                                                                                  "fields": {
+                                                                                                    "NAME": ""
+                                                                                                  }
+                                                                                                },
+                                                                                                "block": {
+                                                                                                  "type": "variables_get",
+                                                                                                  "id": "+7@l3!WsW.qtT-VrUFUO",
+                                                                                                  "fields": {
+                                                                                                    "VAR": {
+                                                                                                      "id": "yra4=LNH-j[*jFV%4Qsm"
+                                                                                                    }
+                                                                                                  }
+                                                                                                }
+                                                                                              },
+                                                                                              "WIDTH": {
+                                                                                                "shadow": {
+                                                                                                  "type": "math_number",
+                                                                                                  "id": "?}%FBS`31_m%u?bt^:;9",
+                                                                                                  "fields": {
+                                                                                                    "NUM": 1600
+                                                                                                  }
+                                                                                                }
+                                                                                              },
+                                                                                              "HEIGHT": {
+                                                                                                "shadow": {
+                                                                                                  "type": "math_number",
+                                                                                                  "id": "*T=buTOzaBafF;D;-+ab",
+                                                                                                  "fields": {
+                                                                                                    "NUM": 900
+                                                                                                  }
+                                                                                                }
+                                                                                              },
+                                                                                              "JSON": {
+                                                                                                "block": {
+                                                                                                  "type": "scene_get_loaded_from_task",
+                                                                                                  "id": "uxCMliixPP$UqTM_DvyR",
+                                                                                                  "fields": {
+                                                                                                    "TYPE": "text"
+                                                                                                  },
+                                                                                                  "inputs": {
+                                                                                                    "ASSET": {
+                                                                                                      "shadow": {
+                                                                                                        "type": "text",
+                                                                                                        "id": "dwluE[wEj:3?0{S=iYf}",
+                                                                                                        "fields": {
+                                                                                                          "TEXT": "loadUI"
+                                                                                                        }
+                                                                                                      }
+                                                                                                    }
+                                                                                                  }
+                                                                                                }
+                                                                                              }
+                                                                                            }
+                                                                                          }
+                                                                                        }
+                                                                                      },
+                                                                                      "next": {
+                                                                                        "block": {
+                                                                                          "type": "create_material",
+                                                                                          "id": "U6oKZ2r7uQW_aAhq+4vl",
+                                                                                          "inline": false,
+                                                                                          "fields": {
+                                                                                            "TYPE": "StandardMaterial"
+                                                                                          },
+                                                                                          "inputs": {
+                                                                                            "NAME": {
+                                                                                              "shadow": {
+                                                                                                "type": "text",
+                                                                                                "id": "-5l`l3P_2k,nH:bG,Pnm",
+                                                                                                "fields": {
+                                                                                                  "TEXT": "overlayMaterial"
+                                                                                                }
+                                                                                              }
+                                                                                            },
+                                                                                            "OPTIONS": {
+                                                                                              "shadow": {
+                                                                                                "type": "empty_object",
+                                                                                                "id": "oEk3GJ.J6;#wB|~hxmGw"
+                                                                                              },
+                                                                                              "block": {
+                                                                                                "type": "object_create",
+                                                                                                "id": ";02XO+Dsui8$=,eNWC[O",
+                                                                                                "fields": {
+                                                                                                  "EMPTY": false
+                                                                                                },
+                                                                                                "inputs": {
+                                                                                                  "ITEM": {
+                                                                                                    "block": {
+                                                                                                      "type": "standard_material_options",
+                                                                                                      "id": ";CPta,Lttd,w^fa;TUYH",
+                                                                                                      "extraState": {
+                                                                                                        "majorKey": "TEXTURES",
+                                                                                                        "subKey": "emissiveTexture"
+                                                                                                      },
+                                                                                                      "fields": {
+                                                                                                        "MAJOR_KEY": "TEXTURES",
+                                                                                                        "KEY": "emissiveTexture"
+                                                                                                      },
+                                                                                                      "inputs": {
+                                                                                                        "VALUE": {
+                                                                                                          "shadow": {
+                                                                                                            "type": "texture_selector",
+                                                                                                            "id": "|K7Ee6yp4J4pB+EmA]9s",
+                                                                                                            "fields": {
+                                                                                                              "NAME": "null"
+                                                                                                            }
+                                                                                                          },
+                                                                                                          "block": {
+                                                                                                            "type": "variables_get",
+                                                                                                            "id": ".47DyUkP(ak!+uw7:VI4",
+                                                                                                            "fields": {
+                                                                                                              "VAR": {
+                                                                                                                "id": "1SG:w+mkY2C_)TFQ5v`e"
+                                                                                                              }
+                                                                                                            }
+                                                                                                          }
+                                                                                                        }
+                                                                                                      },
+                                                                                                      "next": {
+                                                                                                        "block": {
+                                                                                                          "type": "standard_material_options",
+                                                                                                          "id": "{/*|d;pJC%cE3}*{y^Qt",
+                                                                                                          "extraState": {
+                                                                                                            "majorKey": "TEXTURES",
+                                                                                                            "subKey": "opacityTexture"
+                                                                                                          },
+                                                                                                          "fields": {
+                                                                                                            "MAJOR_KEY": "TEXTURES",
+                                                                                                            "KEY": "opacityTexture"
+                                                                                                          },
+                                                                                                          "inputs": {
+                                                                                                            "VALUE": {
+                                                                                                              "shadow": {
+                                                                                                                "type": "texture_selector",
+                                                                                                                "id": "t!l:J9CyuoLm~h@@-Vt@",
+                                                                                                                "fields": {
+                                                                                                                  "NAME": "null"
+                                                                                                                }
+                                                                                                              },
+                                                                                                              "block": {
+                                                                                                                "type": "variables_get",
+                                                                                                                "id": "S)qu%yGeJzJA1Gkx_6KQ",
+                                                                                                                "fields": {
+                                                                                                                  "VAR": {
+                                                                                                                    "id": "1SG:w+mkY2C_)TFQ5v`e"
+                                                                                                                  }
+                                                                                                                }
+                                                                                                              }
+                                                                                                            }
+                                                                                                          },
+                                                                                                          "next": {
+                                                                                                            "block": {
+                                                                                                              "type": "standard_material_options",
+                                                                                                              "id": "1XC@zebO:^fiOkgAssh]",
+                                                                                                              "extraState": {
+                                                                                                                "majorKey": "GENERAL",
+                                                                                                                "subKey": "disableLighting"
+                                                                                                              },
+                                                                                                              "fields": {
+                                                                                                                "MAJOR_KEY": "GENERAL",
+                                                                                                                "KEY": "disableLighting"
+                                                                                                              },
+                                                                                                              "inputs": {
+                                                                                                                "VALUE": {
+                                                                                                                  "shadow": {
+                                                                                                                    "type": "logic_boolean",
+                                                                                                                    "id": "gMqXP3NMf?+}z$+8g3RD",
+                                                                                                                    "fields": {
+                                                                                                                      "BOOL": "TRUE"
+                                                                                                                    }
+                                                                                                                  }
+                                                                                                                }
+                                                                                                              }
+                                                                                                            }
+                                                                                                          }
+                                                                                                        }
+                                                                                                      }
+                                                                                                    }
+                                                                                                  }
+                                                                                                }
+                                                                                              }
+                                                                                            }
+                                                                                          },
+                                                                                          "next": {
+                                                                                            "block": {
+                                                                                              "type": "mesh_properties_accessors",
+                                                                                              "id": ")or@}zb_4E@,kf*4F@}9",
+                                                                                              "extraState": {
+                                                                                                "isStatement": true,
+                                                                                                "isValueInput": true
+                                                                                              },
+                                                                                              "fields": {
+                                                                                                "METHOD": "set",
+                                                                                                "KEY": "position"
+                                                                                              },
+                                                                                              "inputs": {
+                                                                                                "OBJECT": {
+                                                                                                  "shadow": {
+                                                                                                    "type": "mesh_selector",
+                                                                                                    "id": "WHZbZG)nKE*NA5I=DkT^",
+                                                                                                    "fields": {
+                                                                                                      "NAME": ""
+                                                                                                    }
+                                                                                                  },
+                                                                                                  "block": {
+                                                                                                    "type": "variables_get",
+                                                                                                    "id": "}cZe[R)L6/E|81x(1#ax",
+                                                                                                    "fields": {
+                                                                                                      "VAR": {
+                                                                                                        "id": "yra4=LNH-j[*jFV%4Qsm"
+                                                                                                      }
+                                                                                                    }
+                                                                                                  }
+                                                                                                },
+                                                                                                "VALUE": {
+                                                                                                  "shadow": {
+                                                                                                    "type": "field_vector3",
+                                                                                                    "id": "YCoEolMzdLG*/0eiist.",
+                                                                                                    "fields": {
+                                                                                                      "X": 0,
+                                                                                                      "Y": 2,
+                                                                                                      "Z": -14
+                                                                                                    }
+                                                                                                  }
+                                                                                                }
+                                                                                              },
+                                                                                              "next": {
+                                                                                                "block": {
+                                                                                                  "type": "mesh_properties_accessors",
+                                                                                                  "id": "z.Sa+nbdW2[.pDL%j,f|",
+                                                                                                  "extraState": {
+                                                                                                    "isStatement": true,
+                                                                                                    "isValueInput": true
+                                                                                                  },
+                                                                                                  "fields": {
+                                                                                                    "METHOD": "set",
+                                                                                                    "KEY": "isPickable"
+                                                                                                  },
+                                                                                                  "inputs": {
+                                                                                                    "OBJECT": {
+                                                                                                      "shadow": {
+                                                                                                        "type": "mesh_selector",
+                                                                                                        "id": "WHZbZG)nKE*NA5I=DkT^",
+                                                                                                        "fields": {
+                                                                                                          "NAME": ""
+                                                                                                        }
+                                                                                                      },
+                                                                                                      "block": {
+                                                                                                        "type": "variables_get",
+                                                                                                        "id": "XA~[N3i{R%~~L%ZY]bf(",
+                                                                                                        "fields": {
+                                                                                                          "VAR": {
+                                                                                                            "id": "yra4=LNH-j[*jFV%4Qsm"
+                                                                                                          }
+                                                                                                        }
+                                                                                                      }
+                                                                                                    },
+                                                                                                    "VALUE": {
+                                                                                                      "shadow": {
+                                                                                                        "type": "logic_boolean",
+                                                                                                        "id": "AOA)my).^+~}5~Jl9Y5g",
+                                                                                                        "fields": {
+                                                                                                          "BOOL": "TRUE"
+                                                                                                        }
+                                                                                                      }
+                                                                                                    }
+                                                                                                  },
+                                                                                                  "next": {
+                                                                                                    "block": {
+                                                                                                      "type": "mesh_properties_accessors",
+                                                                                                      "id": "$8JsFFj}ci-X6UVXDT2V",
+                                                                                                      "extraState": {
+                                                                                                        "isStatement": true,
+                                                                                                        "isValueInput": true
+                                                                                                      },
+                                                                                                      "fields": {
+                                                                                                        "METHOD": "set",
+                                                                                                        "KEY": "material"
+                                                                                                      },
+                                                                                                      "inputs": {
+                                                                                                        "OBJECT": {
+                                                                                                          "shadow": {
+                                                                                                            "type": "mesh_selector",
+                                                                                                            "id": "WHZbZG)nKE*NA5I=DkT^",
+                                                                                                            "fields": {
+                                                                                                              "NAME": ""
+                                                                                                            }
+                                                                                                          },
+                                                                                                          "block": {
+                                                                                                            "type": "variables_get",
+                                                                                                            "id": "Tey`pnkl!M(VY%2#gb`=",
+                                                                                                            "fields": {
+                                                                                                              "VAR": {
+                                                                                                                "id": "yra4=LNH-j[*jFV%4Qsm"
+                                                                                                              }
+                                                                                                            }
+                                                                                                          }
+                                                                                                        },
+                                                                                                        "VALUE": {
+                                                                                                          "shadow": {
+                                                                                                            "type": "material_selector",
+                                                                                                            "id": "mpy{6Wr18QALhND$HS3y",
+                                                                                                            "fields": {
+                                                                                                              "NAME": "overlayMaterial"
+                                                                                                            }
+                                                                                                          }
+                                                                                                        }
+                                                                                                      },
+                                                                                                      "next": {
+                                                                                                        "block": {
+                                                                                                          "type": "mesh_properties_accessors",
+                                                                                                          "id": "=T5`Zb3k[=JZ5=--Vo^r",
+                                                                                                          "extraState": {
+                                                                                                            "isStatement": true,
+                                                                                                            "isValueInput": true
+                                                                                                          },
+                                                                                                          "fields": {
+                                                                                                            "METHOD": "set",
+                                                                                                            "KEY": "visibility"
+                                                                                                          },
+                                                                                                          "inputs": {
+                                                                                                            "OBJECT": {
+                                                                                                              "shadow": {
+                                                                                                                "type": "mesh_selector",
+                                                                                                                "id": "WHZbZG)nKE*NA5I=DkT^",
+                                                                                                                "fields": {
+                                                                                                                  "NAME": ""
+                                                                                                                }
+                                                                                                              },
+                                                                                                              "block": {
+                                                                                                                "type": "variables_get",
+                                                                                                                "id": "#u}Oum#XXIV%{2!80W9K",
+                                                                                                                "fields": {
+                                                                                                                  "VAR": {
+                                                                                                                    "id": "yra4=LNH-j[*jFV%4Qsm"
+                                                                                                                  }
+                                                                                                                }
+                                                                                                              }
+                                                                                                            },
+                                                                                                            "VALUE": {
+                                                                                                              "shadow": {
+                                                                                                                "type": "math_number",
+                                                                                                                "id": "T]Bl:~_.4:!FIt;J1J+Q",
+                                                                                                                "fields": {
+                                                                                                                  "NUM": 0
+                                                                                                                }
+                                                                                                              }
+                                                                                                            }
+                                                                                                          },
+                                                                                                          "next": {
+                                                                                                            "block": {
+                                                                                                              "type": "advanced_comment",
+                                                                                                              "id": "iNVr!?s8.RE6YdxY,5pQ",
+                                                                                                              "extraState": {
+                                                                                                                "color": "#a5805b"
+                                                                                                              },
+                                                                                                              "fields": {
+                                                                                                                "COLOR": "#a5805b",
+                                                                                                                "INPUT": "事件"
+                                                                                                              },
+                                                                                                              "next": {
+                                                                                                                "block": {
+                                                                                                                  "type": "listen_pointer_event",
+                                                                                                                  "id": "t![I,+CX|Uu%hA`K/h2}",
+                                                                                                                  "fields": {
+                                                                                                                    "EVENT_TYPE": "BABYLON.PointerEventTypes.POINTERPICK",
+                                                                                                                    "IGNOR_BACKFACE": true
+                                                                                                                  },
+                                                                                                                  "inputs": {
+                                                                                                                    "HIT_CB": {
+                                                                                                                      "block": {
+                                                                                                                        "type": "controls_if",
+                                                                                                                        "id": "2en,GSk@avD]s}V)aTU@",
+                                                                                                                        "inputs": {
+                                                                                                                          "IF0": {
+                                                                                                                            "block": {
+                                                                                                                              "type": "logic_compare",
+                                                                                                                              "id": ")%mpzGln1zQT4bH^V:XI",
+                                                                                                                              "fields": {
+                                                                                                                                "OP": "EQ"
+                                                                                                                              },
+                                                                                                                              "inputs": {
+                                                                                                                                "A": {
+                                                                                                                                  "block": {
+                                                                                                                                    "type": "picking_info",
+                                                                                                                                    "id": "WCv}_lFf+w_,hdv39@VL",
+                                                                                                                                    "fields": {
+                                                                                                                                      "OPTION": "MESH"
+                                                                                                                                    }
+                                                                                                                                  }
+                                                                                                                                },
+                                                                                                                                "B": {
+                                                                                                                                  "block": {
+                                                                                                                                    "type": "variables_get",
+                                                                                                                                    "id": "ZiY;ujNBWRfR*/mq[ya(",
+                                                                                                                                    "fields": {
+                                                                                                                                      "VAR": {
+                                                                                                                                        "id": "yra4=LNH-j[*jFV%4Qsm"
+                                                                                                                                      }
+                                                                                                                                    }
+                                                                                                                                  }
+                                                                                                                                }
+                                                                                                                              }
+                                                                                                                            }
+                                                                                                                          },
+                                                                                                                          "DO0": {
+                                                                                                                            "block": {
+                                                                                                                              "type": "variables_set",
+                                                                                                                              "id": "h]Yvwd|0#Y_T}3t}1qZ/",
+                                                                                                                              "fields": {
+                                                                                                                                "VAR": {
+                                                                                                                                  "id": "ip$~0,YXD7JlEBsQK@Gt"
+                                                                                                                                }
+                                                                                                                              },
+                                                                                                                              "inputs": {
+                                                                                                                                "VALUE": {
+                                                                                                                                  "block": {
+                                                                                                                                    "type": "logic_negate",
+                                                                                                                                    "id": "R/|6RAGq@Q8j3|hqSwtR",
+                                                                                                                                    "inputs": {
+                                                                                                                                      "BOOL": {
+                                                                                                                                        "block": {
+                                                                                                                                          "type": "variables_get",
+                                                                                                                                          "id": "|+ziKc$wK8L}hL[W@D-Z",
+                                                                                                                                          "fields": {
+                                                                                                                                            "VAR": {
+                                                                                                                                              "id": "ip$~0,YXD7JlEBsQK@Gt"
+                                                                                                                                            }
+                                                                                                                                          }
+                                                                                                                                        }
+                                                                                                                                      }
+                                                                                                                                    }
+                                                                                                                                  }
+                                                                                                                                }
+                                                                                                                              },
+                                                                                                                              "next": {
+                                                                                                                                "block": {
+                                                                                                                                  "type": "controls_if",
+                                                                                                                                  "id": "jV}~=b:~6z_x61J1^$%f",
+                                                                                                                                  "extraState": {
+                                                                                                                                    "hasElse": true
+                                                                                                                                  },
+                                                                                                                                  "inputs": {
+                                                                                                                                    "IF0": {
+                                                                                                                                      "block": {
+                                                                                                                                        "type": "variables_get",
+                                                                                                                                        "id": "[qRSAHNex^iuGW+F=cU$",
+                                                                                                                                        "fields": {
+                                                                                                                                          "VAR": {
+                                                                                                                                            "id": "ip$~0,YXD7JlEBsQK@Gt"
+                                                                                                                                          }
+                                                                                                                                        }
+                                                                                                                                      }
+                                                                                                                                    },
+                                                                                                                                    "DO0": {
+                                                                                                                                      "block": {
+                                                                                                                                        "type": "video_texture_playback",
+                                                                                                                                        "id": "ur=Kdx;_mM~:{$DxWm}j",
+                                                                                                                                        "fields": {
+                                                                                                                                          "METHOD": "pause"
+                                                                                                                                        },
+                                                                                                                                        "inputs": {
+                                                                                                                                          "VIDEO_TEXTURE": {
+                                                                                                                                            "shadow": {
+                                                                                                                                              "type": "field_texture",
+                                                                                                                                              "id": "TW4nGpJ6Nc/PQ-Cw0za+",
+                                                                                                                                              "fields": {
+                                                                                                                                                "NAME": "videoTexture"
+                                                                                                                                              }
+                                                                                                                                            }
+                                                                                                                                          }
+                                                                                                                                        },
+                                                                                                                                        "next": {
+                                                                                                                                          "block": {
+                                                                                                                                            "type": "mesh_properties_accessors",
+                                                                                                                                            "id": "laqn*^gN_M8jdNL7!zwL",
+                                                                                                                                            "extraState": {
+                                                                                                                                              "isStatement": true,
+                                                                                                                                              "isValueInput": true
+                                                                                                                                            },
+                                                                                                                                            "fields": {
+                                                                                                                                              "METHOD": "set",
+                                                                                                                                              "KEY": "visibility"
+                                                                                                                                            },
+                                                                                                                                            "inputs": {
+                                                                                                                                              "OBJECT": {
+                                                                                                                                                "shadow": {
+                                                                                                                                                  "type": "mesh_selector",
+                                                                                                                                                  "id": "WHZbZG)nKE*NA5I=DkT^",
+                                                                                                                                                  "fields": {
+                                                                                                                                                    "NAME": ""
+                                                                                                                                                  }
+                                                                                                                                                },
+                                                                                                                                                "block": {
+                                                                                                                                                  "type": "variables_get",
+                                                                                                                                                  "id": "vUI`WDj418h}5o9MDkk]",
+                                                                                                                                                  "fields": {
+                                                                                                                                                    "VAR": {
+                                                                                                                                                      "id": "yra4=LNH-j[*jFV%4Qsm"
+                                                                                                                                                    }
+                                                                                                                                                  }
+                                                                                                                                                }
+                                                                                                                                              },
+                                                                                                                                              "VALUE": {
+                                                                                                                                                "shadow": {
+                                                                                                                                                  "type": "math_number",
+                                                                                                                                                  "id": "9;)lewApHUx5Nm#!ni:w",
+                                                                                                                                                  "fields": {
+                                                                                                                                                    "NUM": 1
+                                                                                                                                                  }
+                                                                                                                                                }
+                                                                                                                                              }
+                                                                                                                                            }
+                                                                                                                                          }
+                                                                                                                                        }
+                                                                                                                                      }
+                                                                                                                                    },
+                                                                                                                                    "ELSE": {
+                                                                                                                                      "block": {
+                                                                                                                                        "type": "video_texture_playback",
+                                                                                                                                        "id": "rN,]y[q%O)#.qrjtwX3#",
+                                                                                                                                        "fields": {
+                                                                                                                                          "METHOD": "play"
+                                                                                                                                        },
+                                                                                                                                        "inputs": {
+                                                                                                                                          "VIDEO_TEXTURE": {
+                                                                                                                                            "shadow": {
+                                                                                                                                              "type": "field_texture",
+                                                                                                                                              "id": "VT1d)/]@o]`x50]Uh8Gs",
+                                                                                                                                              "fields": {
+                                                                                                                                                "NAME": "videoTexture"
+                                                                                                                                              }
+                                                                                                                                            }
+                                                                                                                                          }
+                                                                                                                                        },
+                                                                                                                                        "next": {
+                                                                                                                                          "block": {
+                                                                                                                                            "type": "mesh_properties_accessors",
+                                                                                                                                            "id": "[/aW|)z0xpE?{ZIKsvSI",
+                                                                                                                                            "extraState": {
+                                                                                                                                              "isStatement": true,
+                                                                                                                                              "isValueInput": true
+                                                                                                                                            },
+                                                                                                                                            "fields": {
+                                                                                                                                              "METHOD": "set",
+                                                                                                                                              "KEY": "visibility"
+                                                                                                                                            },
+                                                                                                                                            "inputs": {
+                                                                                                                                              "OBJECT": {
+                                                                                                                                                "shadow": {
+                                                                                                                                                  "type": "mesh_selector",
+                                                                                                                                                  "id": "WHZbZG)nKE*NA5I=DkT^",
+                                                                                                                                                  "fields": {
+                                                                                                                                                    "NAME": ""
+                                                                                                                                                  }
+                                                                                                                                                },
+                                                                                                                                                "block": {
+                                                                                                                                                  "type": "variables_get",
+                                                                                                                                                  "id": "-p,whKqw@+N4,w-^s6f5",
+                                                                                                                                                  "fields": {
+                                                                                                                                                    "VAR": {
+                                                                                                                                                      "id": "yra4=LNH-j[*jFV%4Qsm"
+                                                                                                                                                    }
+                                                                                                                                                  }
+                                                                                                                                                }
+                                                                                                                                              },
+                                                                                                                                              "VALUE": {
+                                                                                                                                                "shadow": {
+                                                                                                                                                  "type": "math_number",
+                                                                                                                                                  "id": "E*!iS)/JQvM#A]GA/*do",
+                                                                                                                                                  "fields": {
+                                                                                                                                                    "NUM": 0
+                                                                                                                                                  }
+                                                                                                                                                }
+                                                                                                                                              }
+                                                                                                                                            }
+                                                                                                                                          }
+                                                                                                                                        }
+                                                                                                                                      }
+                                                                                                                                    }
+                                                                                                                                  }
+                                                                                                                                }
+                                                                                                                              }
+                                                                                                                            }
+                                                                                                                          }
+                                                                                                                        }
+                                                                                                                      }
+                                                                                                                    }
+                                                                                                                  }
+                                                                                                                }
+                                                                                                              }
+                                                                                                            }
+                                                                                                          }
+                                                                                                        }
+                                                                                                      }
+                                                                                                    }
+                                                                                                  }
+                                                                                                }
+                                                                                              }
+                                                                                            }
+                                                                                          }
+                                                                                        }
+                                                                                      }
+                                                                                    }
+                                                                                  }
+                                                                                }
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "variables": [
+        {
+          "name": "isPlaying",
+          "id": "ip$~0,YXD7JlEBsQK@Gt"
+        },
+        {
+          "name": "overlay",
+          "id": "yra4=LNH-j[*jFV%4Qsm"
+        },
+        {
+          "name": "screen",
+          "id": "~e0s8I`F[hCORS2Ygmn^"
+        },
+        {
+          "name": "overlayTexture",
+          "id": "1SG:w+mkY2C_)TFQ5v`e"
+        }
+      ]
+    }
+  },
+  "setting": {
+    "data": {
+      "gutterPosition": "77",
+      "openInspector": false,
+      "glob": []
+    }
+  }
+}
